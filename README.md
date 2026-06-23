@@ -1,4 +1,15 @@
+---
+title: Vigilant RAG
+emoji: 🛡️
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # VigilantRAG: Self-Correcting Multi-Stage RAG Engine
+
 
 Standard Retrieval-Augmented Generation (RAG) pipelines suffer from **"garbage-in, garbage-out."** If the vector database retrieves irrelevant documents, the LLM hallucinates incorrect answers. 
 
