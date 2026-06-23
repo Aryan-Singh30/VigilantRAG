@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VigilantRAG Technical Manual & Interview Guide</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #2D3748;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px;
+            background-color: #FFFFFF;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            color: #1A202C;
+            page-break-after: avoid;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            border-bottom: 3px solid #3182CE;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            border-bottom: 1px solid #E2E8F0;
+            padding-bottom: 8px;
+            margin-top: 40px;
+            color: #2B6CB0;
+        }
+
+        h3 {
+            font-size: 1.3em;
+            margin-top: 20px;
+            color: #2D3748;
+        }
+
+        p, li {
+            font-size: 1.05em;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background-color: #EDF2F7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            font-family: 'Fira Code', monospace;
+            background-color: #1A202C;
+            color: #F7FAFC;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9em;
+            line-height: 1.5;
+            page-break-inside: avoid;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.95em;
+            page-break-inside: avoid;
+        }
+
+        th, td {
+            border: 1px solid #CBD5E0;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #F7FAFC;
+            color: #2D3748;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        .manual-header {
+            text-align: center;
+            padding: 60px 0;
+            border-bottom: 2px solid #E2E8F0;
+            margin-bottom: 40px;
+        }
+
+        .manual-header h1 {
+            border: none;
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #1A202C;
+        }
+
+        .manual-header p {
+            font-size: 1.3em;
+            color: #718096;
+            margin: 0;
+        }
+
+        .badge {
+            background-color: #EBF8FF;
+            color: #2B6CB0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        blockquote {
+            border-left: 4px solid #3182CE;
+            background-color: #EBF8FF;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+        
+        .diagram-box {
+            background-color: #F7FAFC;
+            border: 1px dashed #CBD5E0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                font-size: 12pt;
+                color: #000000;
+            }
+            
+            h1, h2, h3 {
+                color: #000000;
+            }
+
+            pre {
+                background-color: #F7FAFC;
+                color: #000000;
+                border: 1px solid #CBD5E0;
+                white-space: pre-wrap;
+            }
+
+            code {
+                background-color: #F7FAFC;
+                border: 1px solid #CBD5E0;
+            }
+
+            blockquote {
+                background-color: #F7FAFC;
+                border-left-color: #000000;
+            }
+
+            th {
+                background-color: #EDF2F7;
+            }
+            
+            .diagram-box {
+                background-color: #FFFFFF;
+                border-color: #000000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="manual-header">
+        <h1>VigilantRAG</h1>
+        <p>Technical Reference Manual & Interview Preparation Guide</p>
+        <span class="badge">Version 1.0.0</span>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>1. Executive Summary & Project Vision</h2>
+    <p><strong>VigilantRAG</strong> is an advanced, production-grade <strong>Self-Correcting Retrieval-Augmented Generation (RAG)</strong> engine. Traditional RAG setups suffer from critical vulnerabilities when deployed in production:</p>
+    <ul>
+        <li><strong>Retrieval Noise:</strong> Semantic search models retrieve irrelevant context because queries are often short or contain keywords not matching the document corpus.</li>
+        <li><strong>Hallucinations:</strong> Large Language Models (LLMs) compose answers that sound authoritative but contain statements completely unsupported by the retrieved documents.</li>
+        <li><strong>Static Execution:</strong> Traditional RAG loops are linear (Retrieve &rarr; Generate). If retrieval returns junk context, the LLM generates junk answers, with no mechanism to self-correct.</li>
+    </ul>
+    <p>VigilantRAG addresses these challenges by introducing an active, self-correcting feedback loop:</p>
+    <ol>
+        <li>It evaluates the quality of retrieved contexts using a **Cross-Encoder re-ranker**. If context relevance drops below a threshold, it triggers **Query Expansion** (synonyms/LLM rephrase) to fetch better data.</li>
+        <li>It runs a **Natural Language Inference (NLI)** auditor against the LLM's draft answer.</li>
+        <li>If a contradiction is detected, the draft is blocked, LLM parameters are adjusted (increasing temperature, adding strict prompt constraints), and the answer is regenerated until it passes the audit.</li>
+    </ol>
+
+    <h2>2. Tech Stack Architecture & Tradeoffs</h2>
+    <p>This project uses a fully local, resource-efficient stack designed to run on low-tier CPUs (such as free Hugging Face instances) while maintaining high precision. Below is the technical breakdown and design tradeoffs:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Selected Tech</th>
+                <th>Why We Used It</th>
+                <th>Why Not Alternatives?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Programming Language</strong></td>
+                <td>Python 3.11</td>
+                <td>Standard for AI/ML engineering. Native libraries for tensor operations, vector spaces, and transformers.</td>
+                <td><em>Node.js / Go:</em> Immature tooling for local model weights and execution.</td>
+            </tr>
+            <tr>
+                <td><strong>Web Server</strong></td>
+                <td>FastAPI</td>
+                <td>Asynchronous, highly performant, handles concurrent loops, native Pydantic validation, auto-generated OpenAPI docs.</td>
+                <td><em>Flask:</em> Synchronous blockages, requires manual plugins.<br><em>Django:</em> Heavyweight, bloated for a single-page engine.</td>
+            </tr>
+            <tr>
+                <td><strong>Dense Index</strong></td>
+                <td>FAISS</td>
+                <td>High-performance local vector similarity search. In-memory, runs on CPU without background services.</td>
+                <td><em>Pinecone/Milvus:</em> Costly, require internet APIs or complex docker containers.</td>
+            </tr>
+            <tr>
+                <td><strong>Sparse Index</strong></td>
+                <td>Rank-BM25</td>
+                <td>Term-frequency matching. Essential for exact names, specific serial numbers, and technical jargon.</td>
+                <td><em>SQL LIKE:</em> Inefficient, does not compute statistical term frequency.</td>
+            </tr>
+            <tr>
+                <td><strong>Bi-Encoder</strong></td>
+                <td>all-MiniLM-L6-v2</td>
+                <td>384-dimensional dense embedding model. Extremely lightweight (90MB), runs in milliseconds on CPU.</td>
+                <td><em>OpenAI embeddings:</em> Introduces network dependency, API costs, and privacy concerns.</td>
+            </tr>
+            <tr>
+                <td><strong>Re-ranker Model</strong></td>
+                <td>ms-marco-MiniLM-L-6-v2</td>
+                <td>Cross-Encoder model. Scores query-document pairs jointly to capture deep semantic relevance.</td>
+                <td><em>Cosine Similarity alone:</em> Fails to capture subtle word interactions.</td>
+            </tr>
+            <tr>
+                <td><strong>Factual Auditor</strong></td>
+                <td>nli-deberta-v3-xsmall</td>
+                <td>Natural Language Inference classifier. Detects logical conflicts between answer and source context.</td>
+                <td><em>LLM-as-a-Judge:</em> Slow, non-deterministic, expensive, and can hallucinate the audit.</td>
+            </tr>
+            <tr>
+                <td><strong>Generative LLM</strong></td>
+                <td>Qwen2.5-0.5B-Instruct</td>
+                <td>Lightweight, 0.5B instruction-tuned model. Runs locally on CPU, handles system prompts cleanly.</td>
+                <td><em>Llama-3-8B:</em> Too heavy for basic servers (requires dedicated GPU).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <h2>3. Pipeline Architecture & Data Flow</h2>
+    <p>The following text diagram details how data flows through the multi-stage engine for every query:</p>
+
+    <div class="diagram-box">
+[User Query]
+    │
+    ▼
+1. [Hybrid Retrieval] ────► Extracts top 25 chunks from FAISS (Dense)
+    │                  ────► Extracts top 25 chunks from BM25 (Sparse)
+    ▼
+2. [Merge & Deduplicate] ──► Combines candidate pools into top 50 unique chunks
+    │
+    ▼
+3. [Cross-Encoder Re-rank] ─► Evaluates exact query-context pairs
+    │
+    ├───► [Relevance Check] ──► Highest Score < 0.4?
+    │          │
+    │          ├───► (Yes) ──► 3a. [Query Expansion]
+    │          │                    ├──► Synonym Thesaurus lookup
+    │          │                    ├──► LLM Query rephrase
+    │          │                    └──► Loop back to Hybrid Retrieval (Max 1 rewrite)
+    │          │
+    │          └───► (No) ──► Proceed to Generation
+    ▼
+4. [LLM Response Draft] ───► Generates answer based on top 5 re-ranked chunks
+    │
+    ▼
+5. [NLI Factuality Audit] ─► Grades draft against source contexts
+    │
+    ├───► [Hallucination Check] ──► Entailment Score < 0.6?
+    │          │
+    │          ├───► (Yes) ──► 5a. [Self-Correction Loop]
+    │          │                    ├──► Increment attempt counter
+    │          │                    ├──► Increase LLM Temperature (0.2 -> 0.7)
+    │          │                    ├──► Inject strict factual prompts
+    │          │                    └──► Loop back to LLM Response Draft (Max 3 attempts)
+    │          │
+    │          └───► (No) ──► Response Approved
+    ▼
+[Display Output + Telemetry UI]
+    </div>
+
+    <h2>4. Detailed Codebase File Directory</h2>
+    <p>Here is what each file in the workspace is responsible for:</p>
+    <ul>
+        <li><code>src/config.py</code>: Configures model names, directory paths (such as the <code>data/</code> folder), default thresholds (relevance=0.40, NLI=0.60), and system prompt templates.</li>
+        <li><code>src/retriever.py</code>: Manages document ingestion. Chunks text with configurable overlap, runs the FAISS vector index, handles BM25 tokenization, and merges results.</li>
+        <li><code>src/reranker.py</code>: Computes joint query-context logits using the Cross-Encoder model and sorts chunks by score.</li>
+        <li><code>src/query_expansion.py</code>: Performs query rewriting. Contains synonym rules (e.g. mapping "wfh" &rarr; "remote", "study" &rarr; "learning") and fallback LLM rephrasing prompts.</li>
+        <li><code>src/hallucination_guard.py</code>: Evaluates the factual alignment of drafts against the context. Outputs entailment, neutral, and contradiction scores.</li>
+        <li><code>src/llm_client.py</code>: Manages the local Qwen2.5 model instance, formats instruction prompts, and adjusts temperatures.</li>
+        <li><code>src/engine.py</code>: Coordinates the pipeline. Collects telemetry logs (timing metrics, intermediate drafts, scores) and exposes the clean <code>query()</code> function.</li>
+        <li><code>app.py</code>: FastAPI server file. Sets up CORS, mounts static UI files, and defines API endpoints (<code>/api/query</code>, <code>/api/ingest</code>, <code>/api/documents</code>).</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>5. Interactive Dashboard UI Walkthrough</h2>
+    <p>The dashboard is built with a premium glassmorphic dark-mode CSS theme. Here is how each visual component works:</p>
+    
+    <h3>A. Sidebar Control Panel</h3>
+    <ul>
+        <li><strong>Relevance Threshold Slider:</strong> Sets the limit for query correction. If the top document score is below this value, the engine assumes the context is irrelevant and triggers Query Expansion.</li>
+        <li><strong>Entailment Threshold Slider:</strong> The safety threshold. If the NLI entailment score of the generated text falls below this value, the response is discarded as a hallucination.</li>
+        <li><strong>LLM Temperature Slider:</strong> Adjusts randomness. Low temperatures (0.1 - 0.2) force the model to stick strictly to facts. High temperatures (0.6 - 0.8) are automatically triggered during self-correction to help the model escape phrasing loops.</li>
+        <li><strong>Ingest Document Form:</strong> Processes custom documents in real-time, breaking them into overlapping chunks and re-indexing them instantly.</li>
+    </ul>
+
+    <h3>B. Pipeline Trace Map (Timeline)</h3>
+    <p>A visual timeline representing the stages of execution. Clicking on any step dynamically populates the details panel on the right with internal execution variables:</p>
+    <ul>
+        <li><strong>Input Query:</strong> Shows the raw user question.</li>
+        <li><strong>Hybrid Search:</strong> Displays side-by-side list of FAISS semantic matches and BM25 exact keyword matches.</li>
+        <li><strong>Re-ranking:</strong> Lists sorted chunks with their Cross-Encoder relevance scores.</li>
+        <li><strong>Query Expansion:</strong> Shows synonym lookup logs and the rewritten query string.</li>
+        <li><strong>LLM Generate:</strong> Shows the raw template prompts, formatting, and intermediate drafts.</li>
+        <li><strong>NLI Audit:</strong> Displays NLI scores (Entailment, Neutral, Contradiction) as progress bars.</li>
+    </ul>
+
+    <h3>C. Telemetry & Answer Cards</h3>
+    <ul>
+        <li><strong>Answer Card (Left):</strong> Renders the final answer. Includes color-coded status badges: Green (<em>Verified Factual</em>), Orange (<em>Corrected & Verified</em>), or Red (<em>Blocked</em>). Displays execution duration.</li>
+        <li><strong>Stage Details (Right):</strong> An interactive display showcasing the mathematical output, synonyms, or NLI charts corresponding to the clicked timeline stage.</li>
+    </ul>
+
+    <h2>6. Key Technical Definitions</h2>
+    <ul>
+        <li><strong>Vector Embedding:</strong> A dense numerical list representing a text's meaning in a multi-dimensional space, where similar concepts sit closer together.</li>
+        <li><strong>Bi-Encoder:</strong> Encodes queries and documents separately. Super-fast at retrieval over large collections, but less precise at complex semantic matching.</li>
+        <li><strong>Cross-Encoder:</strong> Encodes queries and documents together. Highly accurate at scoring semantic matching because it applies self-attention over both query and document text simultaneously. Too slow to run over millions of files, so used as a re-ranker.</li>
+        <li><strong>Natural Language Inference (NLI):</strong> The task of determining the logical relationship between a Premise (source context) and a Hypothesis (AI answer). The output categories are:
+            <ul>
+                <li><em>Entailment:</em> The hypothesis is logically supported by the premise.</li>
+                <li><em>Contradiction:</em> The hypothesis contradicts or asserts facts not in the premise.</li>
+                <li><em>Neutral:</em> The hypothesis is unrelated to the premise.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>7. Interview Q&A Cheat Sheet</h2>
+    
+    <blockquote>
+        <strong>Q1: What happens when the RAG retriever fails to find relevant documents on the first pass?</strong><br>
+        <strong>A:</strong> VigilantRAG monitors the Cross-Encoder score of the top-ranked chunk. If it falls below the relevance threshold (e.g. 0.40), the engine flags it as irrelevant context. It stops, expands the query with domain synonyms or an LLM rewrite, and re-executes the search. This prevents the model from generating answers based on unrelated, garbage context.
+    </blockquote>
+
+    <blockquote>
+        <strong>Q2: Why use an NLI model for hallucination checking instead of another LLM query?</strong><br>
+        <strong>A:</strong> NLI models are specialized classifiers trained specifically to grade logical entailment. They are deterministic, fast (running in milliseconds on CPU), and output exact probability logits. Using an LLM to check another LLM is slow, expensive, prone to prompt injection, and suffers from the same hallucination issues it is trying to detect.
+    </blockquote>
+
+    <blockquote>
+        <strong>Q3: How does the system handle "unanswerable" questions where facts do not exist in the corpus?</strong><br>
+        <strong>A:</strong> When a user asks an unanswerable question, the initial relevance check fails, triggering query expansion. If the second retrieval pass still fails to find relevant chunks (relevance remains &lt; 0.40), the engine instructs the LLM to output a fallback response ("I do not have sufficient information in the context to answer this question.") which passes the NLI check because it makes no active assertions.
+    </blockquote>
+
+    <blockquote>
+        <strong>Q4: Why run the models locally inside the container instead of calling API endpoints?</strong><br>
+        <strong>A:</strong> Local model execution ensures absolute data privacy, eliminates API costs, avoids network latency/outages, and ensures the application is completely self-contained. By using optimized, small-footprint models (like MiniLM and Qwen-0.5B), we run inference quickly on basic CPU servers.
+    </blockquote>
+
+    <div style="text-align: center; margin-top: 50px; color: #A0AEC0; font-size: 0.85em;">
+        VigilantRAG project documentation &copy; 2026. Prepared for technical portfolio review.
+    </div>
+
+</body>
+</html>
