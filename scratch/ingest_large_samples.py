@@ -7,63 +7,50 @@ sys.path.append(project_root)
 
 from src.retriever import HybridRetriever
 
+def ingest_file_if_exists(retriever, samples_dir, filename, doc_id, title, author, source):
+    path = os.path.join(samples_dir, filename)
+    if os.path.exists(path):
+        print(f"\nReading {filename} from {path}...")
+        with open(path, "r", encoding="utf-8") as f:
+            text = f.read()
+        print(f"Ingesting '{title}' ({len(text)} characters)...")
+        chunks = retriever.ingest_document(
+            doc_id=doc_id,
+            title=title,
+            text=text,
+            metadata={"author": author, "source": source}
+        )
+        print(f"  SUCCESS: Created {chunks} chunks.")
+        return chunks
+    else:
+        print(f"\nFile {filename} not found. Skipping...")
+        return 0
+
 def main():
     print("Initializing HybridRetriever...")
     retriever = HybridRetriever()
     samples_dir = os.path.join(project_root, "samples")
     
-    # 1. Moby Dick
-    moby_path = os.path.join(samples_dir, "moby_dick.txt")
-    if os.path.exists(moby_path):
-        print(f"Reading Moby Dick from {moby_path}...")
-        with open(moby_path, "r", encoding="utf-8") as f:
-            text = f.read()
-        print(f"Ingesting 'Moby-Dick; Or, The Whale' ({len(text)} characters)...")
-        chunks = retriever.ingest_document(
-            doc_id="moby_dick",
-            title="Moby-Dick; Or, The Whale",
-            text=text,
-            metadata={"author": "Herman Melville", "source": "Project Gutenberg"}
-        )
-        print(f"  SUCCESS: Created {chunks} chunks.")
-    else:
-        print("Moby Dick text file not found.")
-
-    # 2. RFC 6749 (OAuth 2.0)
-    oauth2_path = os.path.join(samples_dir, "rfc6749_oauth2.txt")
-    if os.path.exists(oauth2_path):
-        print(f"\nReading RFC 6749 from {oauth2_path}...")
-        with open(oauth2_path, "r", encoding="utf-8") as f:
-            text = f.read()
-        print(f"Ingesting 'RFC 6749: The OAuth 2.0 Authorization Framework' ({len(text)} characters)...")
-        chunks = retriever.ingest_document(
-            doc_id="rfc6749_oauth2",
-            title="RFC 6749: The OAuth 2.0 Authorization Framework",
-            text=text,
-            metadata={"author": "D. Hardt, Ed.", "source": "IETF RFC"}
-        )
-        print(f"  SUCCESS: Created {chunks} chunks.")
-    else:
-        print("RFC 6749 text file not found.")
-
-    # 3. RFC 7519 (JWT)
-    jwt_path = os.path.join(samples_dir, "rfc7519_jwt.txt")
-    if os.path.exists(jwt_path):
-        print(f"\nReading RFC 7519 from {jwt_path}...")
-        with open(jwt_path, "r", encoding="utf-8") as f:
-            text = f.read()
-        print(f"Ingesting 'RFC 7519: JSON Web Token (JWT)' ({len(text)} characters)...")
-        chunks = retriever.ingest_document(
-            doc_id="rfc7519_jwt",
-            title="RFC 7519: JSON Web Token (JWT)",
-            text=text,
-            metadata={"author": "M. Jones, et al.", "source": "IETF RFC"}
-        )
-        print(f"  SUCCESS: Created {chunks} chunks.")
-    else:
-        print("RFC 7519 text file not found.")
-
-    print("\nOffline ingestion of large samples completed successfully!")
+    # List of files to ingest
+    files_to_ingest = [
+        # Novels
+        ("moby_dick.txt", "moby_dick", "Moby-Dick; Or, The Whale", "Herman Melville", "Project Gutenberg"),
+        ("sherlock_holmes.txt", "sherlock_holmes", "The Adventures of Sherlock Holmes", "Arthur Conan Doyle", "Project Gutenberg"),
+        ("dracula.txt", "dracula", "Dracula", "Bram Stoker", "Project Gutenberg"),
+        ("frankenstein.txt", "frankenstein", "Frankenstein; Or, The Modern Prometheus", "Mary Wollstonecraft Shelley", "Project Gutenberg"),
+        ("alice_in_wonderland.txt", "alice_in_wonderland", "Alice's Adventures in Wonderland", "Lewis Carroll", "Project Gutenberg"),
+        
+        # Technical specifications
+        ("rfc6749_oauth2.txt", "rfc6749_oauth2", "RFC 6749: The OAuth 2.0 Authorization Framework", "D. Hardt, Ed.", "IETF RFC"),
+        ("rfc7519_jwt.txt", "rfc7519_jwt", "RFC 7519: JSON Web Token (JWT)", "M. Jones, et al.", "IETF RFC")
+    ]
+    
+    total_chunks = 0
+    for filename, doc_id, title, author, source in files_to_ingest:
+        chunks = ingest_file_if_exists(retriever, samples_dir, filename, doc_id, title, author, source)
+        total_chunks += chunks
+        
+    print(f"\nOffline ingestion completed. Total chunks created: {total_chunks}")
 
 if __name__ == "__main__":
     main()

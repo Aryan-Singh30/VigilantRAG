@@ -55,3 +55,38 @@ Use these to verify search re-ranking, synonym query expansion, and NLI hallucin
 - "Explain the purpose of the 'iss', 'sub', and 'aud' claims."
 - "How is a JSON Web Token secured against tampering?"
 - "What is the difference between a JWS and a JWE?"
+
+--------------------------------------------------------------------------------
+5. TESTING CLASSIC LITERATURE KNOWLEDGE BASE (Ingest: samples/ novels)
+--------------------------------------------------------------------------------
+
+[A] SHERLOCK HOLMES (Ingest: samples/sherlock_holmes.txt)
+- "Who is Sherlock Holmes's loyal assistant and chronicler?"
+- "What is the address of Sherlock Holmes's lodgings in London?"
+- "Describe Holmes's method of deduction as explained to Dr. Watson."
+- "Who is Irene Adler and what role does she play in A Scandal in Bohemia?"
+
+[B] ALICE IN WONDERLAND (Ingest: samples/alice_in_wonderland.txt)
+- "What does Alice follow down the rabbit hole?"
+- "Describe the conversation between Alice and the Cheshire Cat regarding directions."
+- "What is written on the label of the bottle Alice finds in the hall?"
+- "What game does the Queen of Hearts invite Alice to play, and what are the mallets?"
+
+[C] DRACULA (Ingest: samples/dracula.txt)
+- "Who travels to Transylvania to meet Count Dracula for a real estate transaction?"
+- "Describe Dracula's physical appearance when Jonathan Harker first meets him."
+- "Who is the professor and doctor called in to help Lucy Westenra?"
+- "What happens to Lucy Westenra after she dies?"
+
+[D] FRANKENSTEIN (Ingest: samples/frankenstein.txt)
+- "Who is the Swiss scientist who creates the monster?"
+- "How does the creature learn to speak and read?"
+- "What does the creature demand Victor Frankenstein create for him?"
+- "Where does the final confrontation between Victor and his creature take place?"
+
+[E] MOBY DICK (Ingest: samples/moby_dick.txt)
+- "What is the name of the ship commanded by Captain Ahab?"
+- "Who is the narrator of the story, and what is the opening line of the book?"
+- "What is the name of the pagan harpooner who becomes close friends with Ishmael?"
+- "What is the main motivation behind Captain Ahab's hunt for the white whale?"
+
