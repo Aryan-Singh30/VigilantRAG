@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VigilantRAG - Self-Correcting Multi-Stage RAG Engine</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Header / Stats Bar -->
+        <header class="main-header">
+            <div class="logo-area">
+                <i class="fa-solid fa-shield-halved logo-icon"></i>
+                <div class="logo-text">
+                    <h1>Vigilant<span>RAG</span></h1>
+                    <p>Self-Correcting Multi-Stage RAG Engine</p>
+                </div>
+            </div>
+            
+            <div class="live-telemetry">
+                <div class="telemetry-card" id="stat-queries">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label"><i class="fa-solid fa-search"></i> Total Queries</span>
+                </div>
+                <div class="telemetry-card" id="stat-expansions">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label"><i class="fa-solid fa-arrows-split-up-and-left text-warning"></i> Corrections</span>
+                </div>
+                <div class="telemetry-card" id="stat-blocks">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label"><i class="fa-solid fa-ban text-danger"></i> Hallucinations Blocked</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <div class="workspace">
+            
+            <!-- Sidebar: Parameters & Document Ingestor -->
+            <aside class="sidebar">
+                
+                <!-- Section 1: ML Model Controls -->
+                <div class="sidebar-section">
+                    <h2><i class="fa-solid fa-sliders"></i> Engine Parameters</h2>
+                    
+                    <div class="control-group">
+                        <div class="slider-header">
+                            <label for="param-relevance">Relevance Threshold</label>
+                            <span id="val-relevance">0.40</span>
+                        </div>
+                        <input type="range" id="param-relevance" min="0.0" max="1.0" step="0.05" value="0.40">
+                        <span class="help-text">Cross-Encoder score threshold. Below this triggers search terms rewrite.</span>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="slider-header">
+                            <label for="param-nli">Entailment Threshold</label>
+                            <span id="val-nli">0.60</span>
+                        </div>
+                        <input type="range" id="param-nli" min="0.0" max="1.0" step="0.05" value="0.60">
+                        <span class="help-text">Minimum NLI score required to pass response truthfulness audit.</span>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="slider-header">
+                            <label for="param-temp">LLM Temperature</label>
+                            <span id="val-temp">0.20</span>
+                        </div>
+                        <input type="range" id="param-temp" min="0.0" max="1.0" step="0.05" value="0.20">
+                        <span class="help-text">Controls randomness of the generative answer. Lower is more factual.</span>
+                    </div>
+                </div>
+
+                <!-- Section 2: Document Ingestion -->
+                <div class="sidebar-section">
+                    <h2><i class="fa-solid fa-file-import"></i> Ingest Document</h2>
+                    <form id="ingest-form">
+                        <div class="form-group">
+                            <input type="text" id="doc-id" placeholder="Document ID (e.g. employee_wfh)" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="doc-title" placeholder="Document Title (e.g. WFH Policy)" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="doc-text" rows="5" placeholder="Paste document content here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" id="btn-ingest">
+                            <i class="fa-solid fa-upload"></i> Process & Index
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Section 3: Ingested Documents Inventory -->
+                <div class="sidebar-section list-section">
+                    <h2><i class="fa-solid fa-database"></i> Active Knowledge</h2>
+                    <div id="documents-list" class="inventory-list">
+                        <p class="empty-list-text">No documents indexed yet.</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                
+                <!-- Search Console -->
+                <section class="console-section glass-card">
+                    <div class="search-box">
+                        <input type="text" id="search-query" placeholder="Ask a question about your ingested documents..." autocomplete="off">
+                        <button id="btn-search" class="btn-search">
+                            <span id="btn-search-text">Search</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Search Results & Visualization Map -->
+                <section id="results-section" class="results-container" style="display: none;">
+                    
+                    <!-- Trace Timeline Map -->
+                    <div class="trace-map-container glass-card">
+                        <h3><i class="fa-solid fa-diagram-project"></i> Pipeline Trace Map</h3>
+                        <div class="trace-timeline">
+                            <div class="timeline-step active" id="step-node-input" data-step="input">
+                                <div class="step-icon"><i class="fa-solid fa-keyboard"></i></div>
+                                <span>Input Query</span>
+                            </div>
+                            
+                            <div class="timeline-line"></div>
+                            
+                            <div class="timeline-step" id="step-node-retrieval" data-step="retrieval">
+                                <div class="step-icon"><i class="fa-solid fa-magnifying-glass-arrow-right"></i></div>
+                                <span>Hybrid Search</span>
+                            </div>
+                            
+                            <div class="timeline-line"></div>
+                            
+                            <div class="timeline-step" id="step-node-rerank" data-step="rerank">
+                                <div class="step-icon"><i class="fa-solid fa-list-ol"></i></div>
+                                <span>Re-ranking</span>
+                            </div>
+                            
+                            <div class="timeline-line"></div>
+                            
+                            <div class="timeline-step" id="step-node-expansion" data-step="expansion">
+                                <div class="step-icon"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
+                                <span>Query Expansion</span>
+                            </div>
+                            
+                            <div class="timeline-line"></div>
+                            
+                            <div class="timeline-step" id="step-node-generation" data-step="generation">
+                                <div class="step-icon"><i class="fa-solid fa-brain"></i></div>
+                                <span>LLM Generate</span>
+                            </div>
+                            
+                            <div class="timeline-line"></div>
+                            
+                            <div class="timeline-step" id="step-node-guard" data-step="guard">
+                                <div class="step-icon"><i class="fa-solid fa-shield-check"></i></div>
+                                <span>NLI Audit</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Double Column Layout: Visualizer Details & Final Answer -->
+                    <div class="outputs-grid">
+                        
+                        <!-- Left Column: Final Verified Answer -->
+                        <div class="answer-card glass-card">
+                            <div class="answer-header">
+                                <h3><i class="fa-solid fa-clipboard-question"></i> Answer</h3>
+                                <span id="answer-badge" class="badge badge-success">Verified Factual</span>
+                            </div>
+                            <div class="answer-body" id="answer-text">
+                                Answer will appear here...
+                            </div>
+                            <div class="answer-meta">
+                                <span id="total-time-badge"><i class="fa-regular fa-clock"></i> Response Time: 0.0s</span>
+                                <span id="corrections-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Queries Expanded: 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Interactive Details Panel (changes based on clicked step) -->
+                        <div class="details-card glass-card">
+                            <div class="details-header">
+                                <h3 id="details-title"><i class="fa-solid fa-info-circle"></i> Stage Details</h3>
+                                <span id="details-subtitle">Click nodes above to inspect execution telemetry</span>
+                            </div>
+                            
+                            <div class="details-body" id="details-content">
+                                <div class="welcome-details">
+                                    <i class="fa-solid fa-arrow-up-long pulse-arrow"></i>
+                                    <p>Select any step in the <strong>Pipeline Trace Map</strong> above to inspect dense/sparse data hits, Cross-Encoder weights, Query Expansion synonyms, NLI logic, or generation history.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Initial Welcome Area -->
+                <section id="welcome-section" class="welcome-container glass-card">
+                    <div class="welcome-logo">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h2>Welcome to VigilantRAG</h2>
+                    <p>This is a live playground to test a <strong>Self-Correcting Retrieval-Augmented Generation Engine</strong>. It guarantees factuality and fixes ambiguous queries on the fly using a multi-stage pipeline:</p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feat-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <h4>Hybrid Search</h4>
+                            <p>Combines FAISS vector embeddings (all-MiniLM-L6-v2) for meaning, and BM25 keywords for precision.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feat-icon"><i class="fa-solid fa-sort-amount-down"></i></div>
+                            <h4>Cross-Encoder Re-rank</h4>
+                            <p>Scores the top 50 matches dynamically, filtering down to the 5 most contextually relevant chunks.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feat-icon"><i class="fa-solid fa-arrow-rotate-left"></i></div>
+                            <h4>Synonym Expansion</h4>
+                            <p>Rewrites queries using thesaurus/LLM synonym trees when initial relevance scores fall below 0.4.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feat-icon"><i class="fa-solid fa-user-shield"></i></div>
+                            <h4>NLI Hallucination Guard</h4>
+                            <p>Uses Natural Language Inference (DeBERTa-v3) to audit answers. Discards and regenerates replies if the AI hallucinates details.</p>
+                        </div>
+                    </div>
+
+                    <div class="quick-ingest-prompt">
+                        <p><i class="fa-solid fa-lightbulb"></i> Get started by loading some documents in the <strong>Ingest Document</strong> sidebar, then ask your question above!</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
