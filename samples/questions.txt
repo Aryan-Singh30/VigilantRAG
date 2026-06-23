@@ -1,0 +1,37 @@
+=== VigilantRAG Test Questions ===
+
+These questions are structured to test specific capabilities of the self-correcting engine. 
+Use these to verify search re-ranking, synonym query expansion, and NLI hallucination checks.
+
+--------------------------------------------------------------------------------
+1. TESTING ACME COMPANY HANDBOOK (Ingest: samples/company_handbook.txt)
+--------------------------------------------------------------------------------
+
+[A] DIRECT MATCH QUERIES (Tests dense + sparse retrieval and 98%+ NLI Entailment)
+- "How much can I get reimbursed for internet costs?"
+- "What dental services are covered by our insurance?"
+- "How many sick leave days are allowed per year?"
+
+[B] SYNONYM EXPANSION QUERIES (Tests relevance threshold < 0.4 and Query Expansion)
+- "what are the study allowances?" 
+  (Synonym rewrite: study -> learning & professional development)
+- "what are the offsite guidelines?" 
+  (Synonym rewrite: offsite -> remote & hybrid)
+- "tell me about health perks" 
+  (Synonym rewrite: perks -> insurance & benefits)
+
+[C] HALLUCINATION GUARD QUERIES (Tests NLI Guard blocking unsupported LLM claims)
+- "Do I get a free iPhone for work?"
+- "Is lunch reimbursed when working in the office?"
+- "Are dental services covered up to 5000 dollars?"
+
+--------------------------------------------------------------------------------
+2. TESTING SQUAD 2.0 NORMANS DATASET (Ingest: auto-loaded during SQuAD script)
+--------------------------------------------------------------------------------
+
+- "In what country is Normandy located?"
+- "Who did Rollo sign the treaty of Saint-Clair-sur-Epte with?"
+- "What is the original meaning of the word Norman?"
+- "What was one of the Norman's major exports?"
+- "Who was the duke in the battle of Hastings?"
+- "Who did the Normans team up with in Anatolia?"
