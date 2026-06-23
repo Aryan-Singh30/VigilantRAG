@@ -35,3 +35,23 @@ Use these to verify search re-ranking, synonym query expansion, and NLI hallucin
 - "What was one of the Norman's major exports?"
 - "Who was the duke in the battle of Hastings?"
 - "Who did the Normans team up with in Anatolia?"
+
+--------------------------------------------------------------------------------
+3. TESTING RFC 6749: OAUTH 2.0 SPECIFICATION (Ingest: samples/rfc6749_oauth2.txt)
+--------------------------------------------------------------------------------
+
+- "What are the four authorization grant types defined in OAuth 2.0?"
+- "Describe the client credentials grant flow."
+- "What is the role of the authorization server?"
+- "What is a redirection URI and why is it used?"
+- "Explain the difference between authorization code and implicit grant types."
+
+--------------------------------------------------------------------------------
+4. TESTING RFC 7519: JSON WEB TOKEN SPECIFICATION (Ingest: samples/rfc7519_jwt.txt)
+--------------------------------------------------------------------------------
+
+- "What are the three parts of a JSON Web Token (JWT)?"
+- "What are the registered claim names defined in the JWT specification?"
+- "Explain the purpose of the 'iss', 'sub', and 'aud' claims."
+- "How is a JSON Web Token secured against tampering?"
+- "What is the difference between a JWS and a JWE?"

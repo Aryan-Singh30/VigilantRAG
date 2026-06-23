@@ -33,6 +33,9 @@ COPY . .
 # Pre-download and cache models in the container image during build time
 RUN python download_models.py
 
+# Pre-build FAISS/BM25 database indices during container build time
+RUN python scratch/ingest_large_samples.py
+
 # Expose port 7860 for Hugging Face Space / external access
 EXPOSE 7860
 
