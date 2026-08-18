@@ -58,7 +58,7 @@
     "userId": "usr_1787054540206_2fcpl",
     "name": "Amit Sharma",
     "email": "sjdfs@gmail.com",
-    "password": "abcd@1234",
+    "password": "$2b$10$qJZ.B7TliONx.mITrPqcNeG2FCbm6CFnXgpfTvkvWA2andLPCGRui",
     "isPremium": false,
     "queryCount": 0,
     "totalStorageBytes": 0,
