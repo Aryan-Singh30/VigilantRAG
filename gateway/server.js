@@ -22,7 +22,25 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 const CHATS_FILE = path.join(__dirname, 'chats.json');
 const multer = require('multer');
 const FormData = require('form-data');
-const upload = multer({ storage: multer.memoryStorage() });
+const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
+
+// Configure secure file upload boundaries
+const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 10 * 1024 * 1024 // Enforce 10MB maximum file size limit
+    },
+    fileFilter: (req, file, cb) => {
+        const allowedExtensions = ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.txt'];
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (allowedExtensions.includes(ext)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Error: Allowed file types are PDF, DOCX, DOC, XLSX, XLS, and TXT only!'));
+        }
+    }
+});
 
 const readChatsDB = () => {
     try {
@@ -59,8 +77,28 @@ const PLAN_LIMITS = {
     }
 };
 
-// Middleware configurations
-app.use(cors());
+// Secure CORS configurations
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'];
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS policy'));
+        }
+    },
+    credentials: true
+}));
+
+// Rate limiting middleware for authentication routes
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 20, // Limit each IP to 20 attempts per window
+    message: { error: "Too many authentication requests from this IP. Please try again after 15 minutes." },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
 // Note: Stripe Webhooks require raw request payloads, so we process JSON format only for normal routes
 app.use((req, res, next) => {
     if (req.originalUrl === '/api/webhook') {
@@ -108,13 +146,40 @@ const authenticateToken = (req, res, next) => {
 // ========================================================
 // 🔑 ROUTE 0: Login and Generate JWT Token
 // ========================================================
-app.post('/api/login', (req, res) => {
+// ========================================================
+// 🔑 ROUTE 0: Login and Generate JWT Token (Rate limited, password verified with migration)
+// ========================================================
+app.post('/api/login', authLimiter, async (req, res) => {
     const { email, password } = req.body;
     const users = readUsersDB();
 
-    // Find matching user credentials
-    const user = users.find(u => u.email === email && u.password === password);
+    // Find user by email
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (!user) {
+        return res.status(401).json({ error: "Invalid email or password." });
+    }
+
+    // Password comparison with migration fallback
+    let validPassword = false;
+    try {
+        if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
+            validPassword = await bcrypt.compare(password, user.password);
+        } else {
+            // Plain text check & auto-migrate to hash
+            if (user.password === password) {
+                validPassword = true;
+                const saltRounds = 10;
+                user.password = await bcrypt.hash(password, saltRounds);
+                writeUsersDB(users);
+                console.log(`[PASSWORD SECURITY MIGRATION] Migrated plain-text credentials to bcrypt hash for user: ${user.email}`);
+            }
+        }
+    } catch (err) {
+        console.error("Encryption verification failed during login:", err.message);
+        return res.status(500).json({ error: "Internal encryption failure." });
+    }
+
+    if (!validPassword) {
         return res.status(401).json({ error: "Invalid email or password." });
     }
 
@@ -137,9 +202,9 @@ app.post('/api/login', (req, res) => {
 });
 
 // ========================================================
-// 📝 ROUTE 0B: Register new user
+// 📝 ROUTE 0B: Register new user (Rate limited, password hashed)
 // ========================================================
-app.post('/api/register', (req, res) => {
+app.post('/api/register', authLimiter, async (req, res) => {
     const { email, password, name, profilePhoto } = req.body;
     
     if (!email || !password) {
@@ -154,40 +219,49 @@ app.post('/api/register', (req, res) => {
         return res.status(400).json({ error: "Email address is already in use." });
     }
 
-    const userId = 'usr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-    const displayName = name || email.split('@')[0];
-    const newUser = {
-        userId: userId,
-        name: displayName,
-        email: email,
-        password: password,
-        isPremium: false,
-        queryCount: 0,
-        totalStorageBytes: 0,
-        uploadedDocuments: [],
-        profilePhoto: profilePhoto || '👨‍💻'
-    };
+    try {
+        // Enforce password hashing
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    users.push(newUser);
-    writeUsersDB(users);
-    console.log(`[USER REGISTRATION] Created new user: ${displayName} (${email})`);
+        const userId = 'usr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+        const displayName = name || email.split('@')[0];
+        const newUser = {
+            userId: userId,
+            name: displayName,
+            email: email,
+            password: hashedPassword,
+            isPremium: false,
+            queryCount: 0,
+            totalStorageBytes: 0,
+            uploadedDocuments: [],
+            profilePhoto: profilePhoto || '👨‍💻'
+        };
 
-    // Generate JWT token containing new user metadata
-    const token = jwt.sign(
-        { userId: newUser.userId, email: newUser.email, name: newUser.name, isPremium: newUser.isPremium },
-        process.env.JWT_SECRET,
-        { expiresIn: '2h' }
-    );
+        users.push(newUser);
+        writeUsersDB(users);
+        console.log(`[USER REGISTRATION] Created new secure user: ${displayName} (${email})`);
 
-    res.status(201).json({
-        token: token,
-        user: {
-            userId: newUser.userId,
-            name: newUser.name,
-            email: newUser.email,
-            isPremium: newUser.isPremium
-        }
-    });
+        // Generate JWT token containing new user metadata
+        const token = jwt.sign(
+            { userId: newUser.userId, email: newUser.email, name: newUser.name, isPremium: newUser.isPremium },
+            process.env.JWT_SECRET,
+            { expiresIn: '2h' }
+        );
+
+        res.status(201).json({
+            token: token,
+            user: {
+                userId: newUser.userId,
+                name: newUser.name,
+                email: newUser.email,
+                isPremium: newUser.isPremium
+            }
+        });
+    } catch (err) {
+        console.error("Failed to register new secure user:", err.message);
+        res.status(500).json({ error: "Registration encryption failed." });
+    }
 });
 
 // ========================================================
