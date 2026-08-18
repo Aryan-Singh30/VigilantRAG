@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import './App.css';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [email, setEmail] = useState('');
@@ -238,7 +240,7 @@ function App() {
     const targetEmail = devEmail || email;
     const targetPassword = devEmail ? 'password123' : password;
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: targetEmail, password: targetPassword })
@@ -283,7 +285,7 @@ function App() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/register', {
+      const res = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -322,7 +324,7 @@ function App() {
 
   const fetchUserStatus = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/user-status', {
+      const res = await fetch(`${API_URL}/api/user-status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -333,7 +335,7 @@ function App() {
 
   const fetchDocuments = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/documents', {
+      const res = await fetch(`${API_URL}/api/documents`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -351,7 +353,7 @@ function App() {
 
   const fetchChatThreads = async (projId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${projId}/chats`, {
+      const res = await fetch(`${API_URL}/api/projects/${projId}/chats`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -363,7 +365,7 @@ function App() {
 
   const handleCreateChatThread = async (projId, threadTitle) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${projId}/chats`, {
+      const res = await fetch(`${API_URL}/api/projects/${projId}/chats`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -380,7 +382,7 @@ function App() {
   const handleDeleteChatThread = async (e, threadId) => {
     e.stopPropagation();
     try {
-      await fetch(`http://localhost:5000/api/projects/${selectedProjectId}/chats/${threadId}`, {
+      await fetch(`${API_URL}/api/projects/${selectedProjectId}/chats/${threadId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -397,7 +399,7 @@ function App() {
     if (newTitle === currentTitle) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${selectedProjectId}/chats/${threadId}`, {
+      const res = await fetch(`${API_URL}/api/projects/${selectedProjectId}/chats/${threadId}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -419,7 +421,7 @@ function App() {
     if (!window.confirm("Are you sure you want to delete this document from the database? This will permanently wipe its text vectors and conversation history.")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/documents/${docId}`, {
+      const res = await fetch(`${API_URL}/api/documents/${docId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -479,7 +481,7 @@ function App() {
     setQuery('');
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/query', {
+      const response = await fetch(`${API_URL}/api/query`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -518,7 +520,7 @@ function App() {
     formData.append('doc_id', docId);
     formData.append('title', uploadTitle);
     try {
-      const res = await fetch('http://localhost:5000/api/ingest-file', {
+      const res = await fetch(`${API_URL}/api/ingest-file`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -543,7 +545,7 @@ function App() {
     setUploadStatus({ type: '', text: '' });
     const docId = `doc_${uploadTitle.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
     try {
-      const res = await fetch('http://localhost:5000/api/ingest', {
+      const res = await fetch(`${API_URL}/api/ingest`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -568,7 +570,7 @@ function App() {
 
   const handleViewDocContent = async (docId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/documents/${docId}`, {
+      const res = await fetch(`${API_URL}/api/documents/${docId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -578,7 +580,7 @@ function App() {
 
   const handleUpgrade = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/create-razorpay-order', {
+      const res = await fetch(`${API_URL}/api/create-razorpay-order`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json', 
@@ -600,7 +602,7 @@ function App() {
         order_id: order.id,
         handler: async function (response) {
           try {
-            const verifyRes = await fetch("http://localhost:5000/api/verify-razorpay-payment", {
+            const verifyRes = await fetch(`${API_URL}/api/verify-razorpay-payment`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -659,7 +661,7 @@ function App() {
     setProfileSaveStatus({ type: '', text: '' });
 
     try {
-      const res = await fetch('http://localhost:5000/api/user-profile', {
+      const res = await fetch(`${API_URL}/api/user-profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -691,7 +693,7 @@ function App() {
     if (!confirmCancel) return;
 
     try {
-      const res = await fetch('http://localhost:5000/api/cancel-subscription', {
+      const res = await fetch(`${API_URL}/api/cancel-subscription`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
