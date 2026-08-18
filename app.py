@@ -1,6 +1,6 @@
 import os
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from typing import Dict, Any, List, Optional
 from src.engine import VigilantRAGEngine
 from src.config import config
+from src.parser import parse_file
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -19,7 +20,7 @@ app = FastAPI(
 # Enable CORS for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5000"], # Allow Node.js backend proxy
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,6 +32,9 @@ engine = VigilantRAGEngine()
 # Request/Response schemas
 class QueryRequest(BaseModel):
     query: str = Field(..., example="What are the remote work guidelines?")
+    use_reranking: Optional[bool] = Field(default=True)
+    use_nli_guard: Optional[bool] = Field(default=True)
+    limit_document_id: Optional[str] = Field(default=None)
     relevance_threshold: Optional[float] = Field(default=None, ge=0.0, le=1.0)
     nli_threshold: Optional[float] = Field(default=None, ge=0.0, le=1.0)
     temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
@@ -46,7 +50,7 @@ class IngestRequest(BaseModel):
 def run_query(payload: QueryRequest):
     """Executes a search query through the self-correcting RAG pipeline."""
     try:
-        # Build overrides dict
+        # Build overrides configuration mapping
         overrides = {}
         if payload.relevance_threshold is not None:
             overrides["relevance_threshold"] = payload.relevance_threshold
@@ -55,7 +59,12 @@ def run_query(payload: QueryRequest):
         if payload.temperature is not None:
             overrides["temperature_default"] = payload.temperature
 
-        # Execute
+        # Plan-based capability limits overrides passed from Gateway
+        overrides["use_reranking"] = payload.use_reranking
+        overrides["use_nli_guard"] = payload.use_nli_guard
+        overrides["limit_document_id"] = payload.limit_document_id
+
+        # Execute query passing the overrides mapping
         result = engine.query(payload.query, config_overrides=overrides)
         return result
     except Exception as e:
@@ -80,6 +89,34 @@ def ingest_document(payload: IngestRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/ingest-file")
+async def ingest_file(
+    doc_id: str = Form(...),
+    title: str = Form(...),
+    file: UploadFile = File(...)
+):
+    """Parses and ingests an uploaded file (.pdf, .docx, .xlsx, .txt)."""
+    try:
+        file_bytes = await file.read()
+        parsed_text = parse_file(file.filename, file_bytes)
+        
+        chunk_count = engine.retriever.ingest_document(
+            doc_id=doc_id,
+            title=title,
+            text=parsed_text,
+            metadata={"filename": file.filename}
+        )
+        
+        return {
+            "status": "success",
+            "message": f"File '{file.filename}' parsed and ingested successfully.",
+            "doc_id": doc_id,
+            "chunks_created": chunk_count,
+            "text_length": len(parsed_text)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File ingestion failed: {str(e)}")
+
 @app.get("/api/documents")
 def list_documents():
     """Lists currently ingested documents and chunk details."""
@@ -96,6 +133,23 @@ def list_documents():
                 "metadata": doc.metadata
             })
         return docs_summary
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/documents/{doc_id}")
+def get_document(doc_id: str):
+    """Retrieves full text and details of a specific document."""
+    try:
+        if doc_id in engine.retriever.documents:
+            doc = engine.retriever.documents[doc_id]
+            return {
+                "id": doc.id,
+                "title": doc.title,
+                "text": doc.text,
+                "metadata": doc.metadata
+            }
+        else:
+            raise HTTPException(status_code=404, detail="Document not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -120,7 +174,7 @@ static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 os.makedirs(static_dir, exist_ok=True)
 
 # Mount static folder
-app.mount("/static", StaticFiles(directory=static_dir), name="static")
+# app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/")
 def read_root():

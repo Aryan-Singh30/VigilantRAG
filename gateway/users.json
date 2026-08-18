@@ -1,0 +1,69 @@
+[
+  {
+    "userId": "usr_free_123",
+    "name": "Amit Sharma (Free User)",
+    "email": "free@example.com",
+    "password": "password123",
+    "isPremium": false,
+    "queryCount": 5,
+    "totalStorageBytes": 144774,
+    "uploadedDocuments": [
+      {
+        "id": "doc_aryan_2_",
+        "name": "aryan(2)",
+        "sizeBytes": 144774
+      }
+    ],
+    "razorpayPaymentId": "pay_mock_1786962208484"
+  },
+  {
+    "userId": "usr_premium_789",
+    "name": "Aryan Singh (Premium User)",
+    "email": "premium@example.com",
+    "password": "password123",
+    "isPremium": true,
+    "stripeCustomerId": "cus_StripeDevCustomer99",
+    "queryCount": 4,
+    "totalStorageBytes": 4527,
+    "uploadedDocuments": [
+      {
+        "id": "doc_aryan",
+        "name": "Aryan",
+        "sizeBytes": 1510
+      },
+      {
+        "id": "doc_aryan",
+        "name": "Aryan",
+        "sizeBytes": 1510
+      },
+      {
+        "id": "doc_aryan",
+        "name": "Aryan",
+        "sizeBytes": 1507
+      }
+    ]
+  },
+  {
+    "userId": "usr_1786963959645_x50sl",
+    "name": "test",
+    "email": "test@example.com",
+    "password": "password123",
+    "isPremium": false,
+    "queryCount": 0,
+    "totalStorageBytes": 0,
+    "uploadedDocuments": [],
+    "profilePhoto": "👨‍💻"
+  },
+  {
+    "userId": "usr_1787054540206_2fcpl",
+    "name": "Amit Sharma",
+    "email": "sjdfs@gmail.com",
+    "password": "abcd@1234",
+    "isPremium": false,
+    "queryCount": 0,
+    "totalStorageBytes": 0,
+    "uploadedDocuments": [],
+    "profilePhoto": "👨‍💻",
+    "phoneNumber": ""
+  }
+]

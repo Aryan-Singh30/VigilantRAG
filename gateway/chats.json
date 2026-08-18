@@ -1,0 +1,346 @@
+{
+  "usr_free_123": {
+    "doc_aryan": {
+      "chats": [
+        {
+          "chatId": "chat_1786958408514_8863o",
+          "chatTitle": "wlfwe",
+          "messages": [
+            {
+              "sender": "user",
+              "text": "afgagfagaG",
+              "timestamp": "2026-08-17T09:20:21.825Z"
+            },
+            {
+              "sender": "ai",
+              "text": "I cannot find the answer in the provided context.",
+              "telemetry": {
+                "original_query": "afgagfagaG",
+                "final_query": "a garbage item",
+                "retrieval_attempts": [
+                  {
+                    "attempt": 0,
+                    "query": "afgagfagaG",
+                    "dense_hits": 3,
+                    "sparse_hits": 0,
+                    "total_candidates": 3,
+                    "top_score": 0.11731487512588501,
+                    "chunks": [],
+                    "status": "irrelevant"
+                  },
+                  {
+                    "attempt": 1,
+                    "query": "a faggot",
+                    "dense_hits": 3,
+                    "sparse_hits": 2,
+                    "total_candidates": 3,
+                    "top_score": 0.12221071869134903,
+                    "chunks": [],
+                    "status": "irrelevant"
+                  },
+                  {
+                    "attempt": 2,
+                    "query": "a garbage item",
+                    "dense_hits": 3,
+                    "sparse_hits": 2,
+                    "total_candidates": 3,
+                    "top_score": 0.12591327726840973,
+                    "chunks": [],
+                    "status": "irrelevant"
+                  }
+                ],
+                "query_expansion_triggered": true,
+                "generation_attempts": [
+                  {
+                    "attempt": 0,
+                    "temperature": 0.2,
+                    "system_prompt": "You are a factual assistant. Answer the query ONLY using the provided context. If the answer cannot be found in the context, say 'I cannot find the answer in the provided context'. Do not use external knowledge or make up facts.",
+                    "response_draft": "I cannot find the answer in the provided context.",
+                    "nli_scores": {
+                      "entailment": 1,
+                      "contradiction": 0,
+                      "neutral": 0
+                    },
+                    "status": "passed"
+                  }
+                ],
+                "hallucination_blocked_count": 0,
+                "success": true,
+                "execution_time_sec": 9.003117084503174
+              },
+              "timestamp": "2026-08-17T09:20:21.826Z"
+            },
+            {
+              "sender": "user",
+              "text": "WHO IS ARYAN",
+              "timestamp": "2026-08-17T09:21:01.904Z"
+            },
+            {
+              "sender": "ai",
+              "text": "ARYAN is a final-year B.Tech Computer Science Engineering student at SRM Institute of Science and Technology with a strong interest in AI/ML engineering, software development, and intelligent automation.",
+              "telemetry": {
+                "original_query": "WHO IS ARYAN",
+                "final_query": "WHO IS ARYAN",
+                "retrieval_attempts": [
+                  {
+                    "attempt": 0,
+                    "query": "WHO IS ARYAN",
+                    "dense_hits": 3,
+                    "sparse_hits": 3,
+                    "total_candidates": 3,
+                    "top_score": 0.6912248134613037,
+                    "chunks": [],
+                    "status": "relevant"
+                  }
+                ],
+                "query_expansion_triggered": false,
+                "generation_attempts": [
+                  {
+                    "attempt": 0,
+                    "temperature": 0.2,
+                    "system_prompt": "You are a factual assistant. Answer the query ONLY using the provided context. If the answer cannot be found in the context, say 'I cannot find the answer in the provided context'. Do not use external knowledge or make up facts.",
+                    "response_draft": "ARYAN is a final-year B.Tech Computer Science Engineering student at SRM Institute of Science and Technology with a strong interest in AI/ML engineering, software development, and intelligent automation.",
+                    "nli_scores": {
+                      "entailment": 1,
+                      "contradiction": 0,
+                      "neutral": 0
+                    },
+                    "status": "passed"
+                  }
+                ],
+                "hallucination_blocked_count": 0,
+                "success": true,
+                "execution_time_sec": 10.38239598274231
+              },
+              "timestamp": "2026-08-17T09:21:01.904Z"
+            },
+            {
+              "sender": "user",
+              "text": "tell me about the project section of aryan",
+              "timestamp": "2026-08-17T09:28:33.363Z"
+            },
+            {
+              "sender": "ai",
+              "text": "The project section of Aryan's CV (Curriculum Vitae) indicates that he has worked on various projects related to AI and ML. Specifically:\n\n1. **Real-world AI Engineering Problems**: Aryan has worked on real-world AI engineering problems rather than academic projects.\n\n2. **Automation, Data Processing, Backend Development, and AI Pipelines**: He has worked on automating, data processing, backend development, and AI pipelines.\n\n3. **ONNX, INT8 Quantization, FAISS, VectorDB, FastAPI, Docker, and RAG**: These are technologies he has explored and used in his projects.\n\n4. **Improving Production Performance and Reliability**: He has explored technologies like ONNX, INT8 quantization, FAISS, VectorDB, FastAPI, Docker, and RAG to improve production performance and reliability.\n\n5. **Building Practical AI Products**: He is particularly interested in building practical AI products.\n\n6. **Understanding How AI Systems Work End-to-End**: He enjoys understanding how AI systems work from document ingestion and embeddings to retrieval, LLM generation, evaluation, and deployment.\n\n7. **Technical Interviews**: He is actively preparing for opportunities at strong technology companies.\n\n8. **System Design and Software Engineering Fundamentals**: He is also focusing on strengthening his DSA, system design, and software engineering fundamentals for technical interviews.\n\n9. **Career Focus**: He is highly career-focused and actively preparing for opportunities at strong technology companies.\n\nSo, the key points about the project section of Aryan's CV include:\n- Working on real-world AI engineering problems.\n- Exploiting various technologies like ONNX, INT8 quantization, FAISS, VectorDB, FastAPI, Docker, and RAG.\n- Improving production performance and reliability.\n- Building practical AI products.\n- Understanding how AI systems work from document ingestion and embeddings to retrieval, LLM generation, evaluation, and deployment.\n- Technical interviews.\n- System design and software engineering fundamentals.\n- Career focus on strong technology companies.",
+              "telemetry": {
+                "original_query": "tell me about the project section of aryan",
+                "final_query": "tell me about the project section of aryan",
+                "retrieval_attempts": [
+                  {
+                    "attempt": 0,
+                    "query": "tell me about the project section of aryan",
+                    "dense_hits": 3,
+                    "sparse_hits": 3,
+                    "total_candidates": 3,
+                    "top_score": 0.8391615152359009,
+                    "chunks": [],
+                    "status": "relevant"
+                  }
+                ],
+                "query_expansion_triggered": false,
+                "generation_attempts": [
+                  {
+                    "attempt": 0,
+                    "temperature": 0.2,
+                    "system_prompt": "You are a factual assistant. Answer the query ONLY using the provided context. If the answer cannot be found in the context, say 'I cannot find the answer in the provided context'. Do not use external knowledge or make up facts.",
+                    "response_draft": "The project section of Aryan's CV (Curriculum Vitae) indicates that he has worked on various projects related to AI and ML. Specifically:\n\n1. **Real-world AI Engineering Problems**: Aryan has worked on real-world AI engineering problems rather than academic projects.\n\n2. **Automation, Data Processing, Backend Development, and AI Pipelines**: He has worked on automating, data processing, backend development, and AI pipelines.\n\n3. **ONNX, INT8 Quantization, FAISS, VectorDB, FastAPI, Docker, and RAG**: These are technologies he has explored and used in his projects.\n\n4. **Improving Production Performance and Reliability**: He has explored technologies like ONNX, INT8 quantization, FAISS, VectorDB, FastAPI, Docker, and RAG to improve production performance and reliability.\n\n5. **Building Practical AI Products**: He is particularly interested in building practical AI products.\n\n6. **Understanding How AI Systems Work End-to-End**: He enjoys understanding how AI systems work from document ingestion and embeddings to retrieval, LLM generation, evaluation, and deployment.\n\n7. **Technical Interviews**: He is actively preparing for opportunities at strong technology companies.\n\n8. **System Design and Software Engineering Fundamentals**: He is also focusing on strengthening his DSA, system design, and software engineering fundamentals for technical interviews.\n\n9. **Career Focus**: He is highly career-focused and actively preparing for opportunities at strong technology companies.\n\nSo, the key points about the project section of Aryan's CV include:\n- Working on real-world AI engineering problems.\n- Exploiting various technologies like ONNX, INT8 quantization, FAISS, VectorDB, FastAPI, Docker, and RAG.\n- Improving production performance and reliability.\n- Building practical AI products.\n- Understanding how AI systems work from document ingestion and embeddings to retrieval, LLM generation, evaluation, and deployment.\n- Technical interviews.\n- System design and software engineering fundamentals.\n- Career focus on strong technology companies.",
+                    "nli_scores": {
+                      "entailment": 0.43833836913108826,
+                      "contradiction": 0.003829386318102479,
+                      "neutral": 0.5578322410583496
+                    },
+                    "status": "passed"
+                  }
+                ],
+                "hallucination_blocked_count": 0,
+                "success": true,
+                "execution_time_sec": 77.9212737083435
+              },
+              "timestamp": "2026-08-17T09:28:33.363Z"
+            },
+            {
+              "sender": "user",
+              "text": "hii",
+              "timestamp": "2026-08-17T09:28:41.921Z"
+            },
+            {
+              "sender": "ai",
+              "text": "I cannot answer this question with absolute certainty based on the provided documents. My NLI guard detected a potential hallucination in the drafted response.",
+              "telemetry": {
+                "original_query": "hii",
+                "final_query": "whats the current weather in new york",
+                "retrieval_attempts": [
+                  {
+                    "attempt": 0,
+                    "query": "hii",
+                    "dense_hits": 3,
+                    "sparse_hits": 0,
+                    "total_candidates": 3,
+                    "top_score": -8.212039947509766,
+                    "chunks": [],
+                    "status": "irrelevant"
+                  },
+                  {
+                    "attempt": 1,
+                    "query": "whats the weather like in new york",
+                    "dense_hits": 3,
+                    "sparse_hits": 2,
+                    "total_candidates": 3,
+                    "top_score": -11.04853630065918,
+                    "chunks": [],
+                    "status": "irrelevant"
+                  },
+                  {
+                    "attempt": 2,
+                    "query": "whats the current weather in new york",
+                    "dense_hits": 3,
+                    "sparse_hits": 2,
+                    "total_candidates": 3,
+                    "top_score": -11.055089950561523,
+                    "chunks": [],
+                    "status": "irrelevant"
+                  }
+                ],
+                "query_expansion_triggered": true,
+                "generation_attempts": [
+                  {
+                    "attempt": 0,
+                    "temperature": 0.2,
+                    "system_prompt": "You are a factual assistant. Answer the query ONLY using the provided context. If the answer cannot be found in the context, say 'I cannot find the answer in the provided context'. Do not use external knowledge or make up facts.",
+                    "response_draft": "Hello!",
+                    "nli_scores": {
+                      "entailment": 0.08005166798830032,
+                      "contradiction": 0.027735281735658646,
+                      "neutral": 0.8922131061553955
+                    },
+                    "status": "hallucinated"
+                  },
+                  {
+                    "attempt": 1,
+                    "temperature": 0.7,
+                    "system_prompt": "CRITICAL: You generated information not present in the context. You must ONLY use the provided context. If the query cannot be answered exactly using the context, say 'I cannot find the answer in the provided context'. DO NOT make up facts. Answer strictly and factually.",
+                    "response_draft": "I cannot find the answer in the provided context.",
+                    "nli_scores": {
+                      "entailment": 0.017241308465600014,
+                      "contradiction": 0.04226857051253319,
+                      "neutral": 0.940490186214447
+                    },
+                    "status": "hallucinated"
+                  },
+                  {
+                    "attempt": 2,
+                    "temperature": 0.7,
+                    "system_prompt": "CRITICAL: You generated information not present in the context. You must ONLY use the provided context. If the query cannot be answered exactly using the context, say 'I cannot find the answer in the provided context'. DO NOT make up facts. Answer strictly and factually.",
+                    "response_draft": "Hi!",
+                    "nli_scores": {
+                      "entailment": 0.08515705168247223,
+                      "contradiction": 0.028730878606438637,
+                      "neutral": 0.8861120343208313
+                    },
+                    "status": "hallucinated"
+                  }
+                ],
+                "hallucination_blocked_count": 3,
+                "success": false,
+                "execution_time_sec": 35.484782218933105
+              },
+              "timestamp": "2026-08-17T09:28:41.921Z"
+            },
+            {
+              "sender": "user",
+              "text": "tell me about the project section of aryan",
+              "timestamp": "2026-08-17T09:30:00.996Z"
+            },
+            {
+              "sender": "ai",
+              "text": "The project section of Arany includes:\n\n- Working as an AI Engineer/Python AI Developer Intern\n- Working with technologies such as ONNX, INT8 quantization, FAISS, VectorDB, FastAPI, Docker, and RAG\n- Exploring methodologies like vector databases, model optimization, and real-world AI engineering problems rather than academic projects\n- Participating in real-world AI engineering challenges and solving them by automating processes, analyzing data, and developing efficient algorithms\n\nArany's interests include building practical AI products that improve production performance and reliability, focusing on understanding AI systems from document ingestion to retrieval, LLM generation, evaluation, and deployment.",
+              "telemetry": {
+                "original_query": "tell me about the project section of aryan",
+                "final_query": "tell me about the project section of aryan",
+                "retrieval_attempts": [
+                  {
+                    "attempt": 0,
+                    "query": "tell me about the project section of aryan",
+                    "dense_hits": 3,
+                    "sparse_hits": 3,
+                    "total_candidates": 3,
+                    "top_score": 0.8391615152359009,
+                    "chunks": [],
+                    "status": "relevant"
+                  }
+                ],
+                "query_expansion_triggered": false,
+                "generation_attempts": [
+                  {
+                    "attempt": 0,
+                    "temperature": 0.2,
+                    "system_prompt": "You are a factual assistant. Answer the query ONLY using the provided context. If the answer cannot be found in the context, say 'I cannot find the answer in the provided context'. Do not use external knowledge or make up facts.",
+                    "response_draft": "The project section of Aryan's CV (Curriculum Vitae) highlights his involvement in various areas related to AI/ML engineering, software development, and intelligent automation. Specifically:\n\n1. **Real-world AI Engineering Problems**: Aryan has worked on real-world AI engineering problems rather than academic projects.\n\n2. **Automation, Data Processing, Backend Development, and AI Pipelines**: He has worked on automating processes, handling data, developing backend applications, and implementing AI pipelines.\n\n3. **ONNX, INT8 Quantization, FAISS, VectorDB, FastAPI, Docker, and RAG**: These technologies have been used in his projects, including ONNX, which is a framework for interoperable neural networks; INT8 quantization, which reduces memory usage by 50% compared to traditional quantization methods; FAISS, which is a scalable graph database; VectorDB, which is designed for efficient storage and retrieval of large amounts of structured data; FastAPI, which is a micro web framework; Docker, which is a platform for running containerized applications; and RAG, which is a system that optimizes the efficiency of data access across multiple databases.\n\n4. **Improving Production Performance and Reliability**: Aryan has explored technologies like ONNX, INT8 quantization, FAISS, VectorDB, FastAPI, Docker, and RAG, with a focus on improving production performance and reliability.\n\n5. **Building Practical AI Products**: His current direction is towards AI Engineering and production-grade GenAI systems, while continuing to strengthen his DSA, system design, and software engineering fundamentals for technical interviews.\n\n6. **Career Focus**: He is actively preparing for opportunities at strong technology companies, rather than merely collecting technologies.\n\n7. **Technical Interviews Preparation**: He is highly career-focused and actively preparing for opportunities at strong technology companies, which indicates a strong commitment to professional growth and success in the field of AI and ML engineering.",
+                    "nli_scores": {
+                      "entailment": 0.051171209663152695,
+                      "contradiction": 0.0021495092660188675,
+                      "neutral": 0.9466792345046997
+                    },
+                    "status": "hallucinated"
+                  },
+                  {
+                    "attempt": 1,
+                    "temperature": 0.7,
+                    "system_prompt": "CRITICAL: You generated information not present in the context. You must ONLY use the provided context. If the query cannot be answered exactly using the context, say 'I cannot find the answer in the provided context'. DO NOT make up facts. Answer strictly and factually.",
+                    "response_draft": "The project section of Arany includes:\n\n- Working as an AI Engineer/Python AI Developer Intern\n- Working with technologies such as ONNX, INT8 quantization, FAISS, VectorDB, FastAPI, Docker, and RAG\n- Exploring methodologies like vector databases, model optimization, and real-world AI engineering problems rather than academic projects\n- Participating in real-world AI engineering challenges and solving them by automating processes, analyzing data, and developing efficient algorithms\n\nArany's interests include building practical AI products that improve production performance and reliability, focusing on understanding AI systems from document ingestion to retrieval, LLM generation, evaluation, and deployment.",
+                    "nli_scores": {
+                      "entailment": 0.2872990667819977,
+                      "contradiction": 0.0014568063197657466,
+                      "neutral": 0.7112441062927246
+                    },
+                    "status": "passed"
+                  }
+                ],
+                "hallucination_blocked_count": 1,
+                "success": true,
+                "execution_time_sec": 73.66124200820923
+              },
+              "timestamp": "2026-08-17T09:30:00.996Z"
+            }
+          ]
+        },
+        {
+          "chatId": "chat_1786959055612_q5ro0",
+          "chatTitle": "abcd",
+          "messages": []
+        }
+      ]
+    },
+    "doc_aryan_2_": {
+      "chats": [
+        {
+          "chatId": "chat_1786959207668_m5p11",
+          "chatTitle": "General Discussion",
+          "messages": []
+        }
+      ]
+    }
+  },
+  "usr_premium_789": {
+    "doc_aryan": {
+      "chats": [
+        {
+          "chatId": "chat_1786963945995_vv9hk",
+          "chatTitle": "General Discussion",
+          "messages": []
+        }
+      ]
+    }
+  },
+  "usr_1787054540206_2fcpl": {
+    "doc_aryan": {
+      "chats": [
+        {
+          "chatId": "chat_1787054540734_ynbtw",
+          "chatTitle": "General Discussion",
+          "messages": []
+        }
+      ]
+    }
+  }
+}

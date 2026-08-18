@@ -23,7 +23,7 @@ class Chunk(BaseModel):
     metadata: Dict[str, Any] = {}
 
 class HybridRetriever:
-    def __init__(self):
+    def __init__(self, lazy_load: bool = False):
         # Create data directory if it doesn't exist
         os.makedirs(config.data_dir, exist_ok=True)
         
@@ -45,6 +45,10 @@ class HybridRetriever:
 
         # Load existing database if available
         self.load()
+        
+        if not lazy_load:
+            print(f"[Retriever] Pre-loading dense embedding model '{config.dense_model_name}' at startup...")
+            self._get_dense_model()
 
     def _get_dense_model(self) -> SentenceTransformer:
         if self.dense_model is None:
@@ -111,34 +115,50 @@ class HybridRetriever:
         """Simple tokenizer for BM25 (lowercase, alphanumeric split)."""
         return [w.strip().lower() for w in text.split() if w.strip()]
 
-    def build_indices(self):
-        """Builds both FAISS and BM25 indices from the current in-memory chunks list."""
+    def build_indices(self, new_chunks_only: Optional[List[Chunk]] = None):
+        """Builds or incrementally updates FAISS and BM25 indices."""
         if not self.chunks:
             self.dense_index = None
             self.bm25 = None
             return
 
-        # 1. Build Dense Index (FAISS)
+        # 1. Build or Update Dense Index (FAISS)
+        if self.dense_index is not None and new_chunks_only:
+            # INCREMENTAL ADD: Encode and append only the new chunks
+            texts = [chunk.text for chunk in new_chunks_only]
+            model = self._get_dense_model()
+            embeddings = model.encode(texts, show_progress_bar=False)
+            
+            # Normalize new embeddings
+            norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+            norms = np.where(norms == 0, 1e-12, norms)
+            normalized_embeddings = embeddings / norms
+            
+            # Append directly to the loaded index
+            self.dense_index.add(normalized_embeddings.astype('float32'))
+            print(f"[FAISS INDEX] Incrementally added {len(new_chunks_only)} new chunk vectors.")
+        else:
+            # FULL REBUILD: First time or after document deletions
+            print(f"[FAISS INDEX] Rebuilding entire dense index with {len(self.chunks)} chunks...")
+            texts = [chunk.text for chunk in self.chunks]
+            model = self._get_dense_model()
+            embeddings = model.encode(texts, show_progress_bar=False)
+            
+            norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+            norms = np.where(norms == 0, 1e-12, norms)
+            normalized_embeddings = embeddings / norms
+            
+            dimension = normalized_embeddings.shape[1]
+            self.dense_index = faiss.IndexFlatIP(dimension)
+            self.dense_index.add(normalized_embeddings.astype('float32'))
+        
+        # 2. Re-build BM25 (Very fast, runs in milliseconds on CPU)
         texts = [chunk.text for chunk in self.chunks]
-        model = self._get_dense_model()
-        embeddings = model.encode(texts, show_progress_bar=False)
-        
-        # L2-normalize embeddings for cosine similarity using inner product
-        norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
-        # Avoid division by zero
-        norms = np.where(norms == 0, 1e-12, norms)
-        normalized_embeddings = embeddings / norms
-        
-        dimension = normalized_embeddings.shape[1]
-        self.dense_index = faiss.IndexFlatIP(dimension)
-        self.dense_index.add(normalized_embeddings.astype('float32'))
-        
-        # 2. Build Sparse Index (BM25)
         self.bm25_tokenized_corpus = [self.tokenize_text(text) for text in texts]
         self.bm25 = BM25Okapi(self.bm25_tokenized_corpus)
 
     def ingest_document(self, doc_id: str, title: str, text: str, metadata: dict = None) -> int:
-        """Chunks a document, adds to index, rebuilds indices, and persists to disk."""
+        """Chunks a document, incrementally updates the index, and persists to disk."""
         if metadata is None:
             metadata = {}
             
@@ -149,16 +169,23 @@ class HybridRetriever:
         # Create Chunks
         new_chunks = self.chunk_text(text, title, doc_id, metadata)
         
-        # Remove any existing chunks for this document ID (to allow overwriting)
+        # Check if we are overwriting an existing document
+        is_overwrite = any(c.doc_id == doc_id for c in self.chunks)
+        
+        # Remove existing chunks for this doc (if overwriting)
         self.chunks = [c for c in self.chunks if c.doc_id != doc_id]
         self.chunks.extend(new_chunks)
         
-        # Rebuild indices
-        self.build_indices()
-        
-        # Save to disk
+        # Update indices dynamically
+        if is_overwrite:
+            # If overwrite/delete happens, we must do a full rebuild
+            self.build_indices()
+        else:
+            # If it's a new document, do a fast delta index update
+            self.build_indices(new_chunks_only=new_chunks)
+            
+        # Save updated database state to disk
         self.save()
-        
         return len(new_chunks)
 
     def delete_document(self, doc_id: str) -> bool:
