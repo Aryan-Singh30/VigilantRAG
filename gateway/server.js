@@ -787,6 +787,9 @@ app.get('/api/user-status', authenticateToken, async (req, res) => {
             res.json({
                 isPremium: user.isPremium,
                 name: user.name,
+                email: user.email,
+                phoneNumber: user.phoneNumber || '',
+                profilePhoto: user.profilePhoto || '👨‍💻',
                 queryCount: user.queryCount,
                 totalStorageBytes: user.totalStorageBytes,
                 uploadedDocuments: user.uploadedDocuments
