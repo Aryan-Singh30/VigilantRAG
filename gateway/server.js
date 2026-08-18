@@ -884,6 +884,14 @@ app.delete('/api/documents/:docId', authenticateToken, async (req, res) => {
     }
 });
 
+// Serve frontend React static build files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Catch-all route to serve React index.html for client-side routing
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.listen(PORT, () => {
     console.log(`⚡ Node.js API Gateway is active on http://localhost:${PORT}`);
 });
