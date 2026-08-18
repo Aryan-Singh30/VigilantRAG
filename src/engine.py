@@ -61,12 +61,17 @@ class VigilantRAGEngine:
                 "status": "pending"
             }
             
-            # 1. Hybrid Search
+             # 1. Hybrid Search
             candidates = self.retriever.search(
                 current_query, 
                 top_k_dense=active_config.top_k_dense, 
                 top_k_sparse=active_config.top_k_sparse
             )
+            
+            # [SaaS Limit] If limit_document_id is set (Free plan: single doc search restriction)
+            if config_overrides and config_overrides.get("limit_document_id"):
+                doc_id_limit = config_overrides["limit_document_id"]
+                candidates = [c for c in candidates if c["chunk"].doc_id == doc_id_limit]
             
             # Count source types for telemetry
             dense_count = sum(1 for c in candidates if "dense" in c["sources"])
@@ -75,20 +80,22 @@ class VigilantRAGEngine:
             attempt_log["sparse_hits"] = sparse_count
             attempt_log["total_candidates"] = len(candidates)
 
-            # 2. Re-ranking
-            reranked = self.reranker.rerank(current_query, candidates, top_n=active_config.top_n_final)
-            attempt_log["chunks"] = [
-                {
-                    "id": item["chunk"].id,
-                    "doc_title": item["chunk"].doc_title,
-                    "text": item["chunk"].text,
-                    "cross_score": item["cross_score"],
-                    "dense_score": item["dense_score"],
-                    "sparse_score": item["sparse_score"],
-                    "sources": item["sources"]
-                }
-                for item in reranked
-            ]
+            # 2. Re-ranking (Bypassed if use_reranking is False in Free plan)
+            if config_overrides and config_overrides.get("use_reranking") is False:
+                # Bypass Cross-Encoder. Direct sort chunks by dense score
+                reranked = [
+                    {
+                        "chunk": item["chunk"],
+                        "cross_score": item.get("dense_score", 0.0), # Fallback mockup score
+                        "dense_score": item.get("dense_score", 0.0),
+                        "sparse_score": item.get("sparse_score", 0.0),
+                        "sources": item.get("sources", ["dense"])
+                    }
+                    for item in candidates[:active_config.top_n_final]
+                ]
+            else:
+                # Standard Cross-Encoder Reranker execution
+                reranked = self.reranker.rerank(current_query, candidates, top_n=active_config.top_n_final)
 
             # 3. Evaluate Retrieval Relevance
             top_score = reranked[0]["cross_score"] if reranked else -1.0
@@ -131,7 +138,7 @@ class VigilantRAGEngine:
             }
 
         # Combine texts from top 5 chunks to serve as context (Premise)
-        context_text = "\n\n".join([item["chunk"].text for item in top_chunks])
+        context_text = "\n\n".join([f"Document [{item['chunk'].doc_title}]: {item['chunk'].text}" for item in top_chunks])
 
         # --- STAGE 2: Generation & Hallucination Guard Loop ---
         final_answer = ""
@@ -169,21 +176,27 @@ class VigilantRAGEngine:
             draft = self.llm.generate(generation_prompt, temperature=current_temp, system_prompt=system_prompt)
             gen_log["response_draft"] = draft
             
-            # 2. Audit Response via NLI Guard
-            is_hallucination, nli_scores = self.hallucination_guard.evaluate_response(context_text, draft)
+            # 2. Audit Response via NLI Guard (Bypassed if use_nli_guard is False in Free plan)
+            if config_overrides and config_overrides.get("use_nli_guard") is False:
+                # Bypass DeBERTa NLI checks. Auto-verify the draft response
+                is_hallucination = False
+                nli_scores = {"entailment": 1.0, "contradiction": 0.0, "neutral": 0.0}
+            else:
+                # Standard DeBERTa validation audit execution
+                is_hallucination, nli_scores = self.hallucination_guard.evaluate_response(context_text, draft)
+            
             gen_log["nli_scores"] = nli_scores
             
             if not is_hallucination:
-                gen_log["status"] = "verified"
-                telemetry["generation_attempts"].append(gen_log)
-                telemetry["success"] = True
                 final_answer = draft
+                telemetry["success"] = True
+                gen_log["status"] = "passed"
+                telemetry["generation_attempts"].append(gen_log)
                 break
             else:
+                telemetry["hallucination_blocked_count"] += 1
                 gen_log["status"] = "hallucinated"
                 telemetry["generation_attempts"].append(gen_log)
-                telemetry["hallucination_blocked_count"] += 1
-                logger.warning(f"Hallucination detected in attempt {attempt} (Entailment: {nli_scores['entailment']:.3f}, Contradiction: {nli_scores['contradiction']:.3f}). Blocking response.")
                 
                 # Adjust generation constraints for next try
                 if attempt < active_config.max_hallucination_retries:

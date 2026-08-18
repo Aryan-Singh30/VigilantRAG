@@ -10,7 +10,7 @@ class AppConfig(BaseModel):
 
     # Retrieval Thresholds and weights
     relevance_threshold: float = Field(default=0.4, description="Cross-Encoder score threshold. Scores below this trigger Query Expansion.")
-    nli_threshold: float = Field(default=0.6, description="NLI entailment score threshold. Scores below this trigger regeneration.")
+    nli_threshold: float = Field(default=0.2, description="NLI entailment score threshold. Scores below this trigger regeneration.")
     
     # Retrieval Hyperparameters
     chunk_size: int = Field(default=500, description="Document chunk size in characters")

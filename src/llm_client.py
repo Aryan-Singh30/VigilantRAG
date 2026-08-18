@@ -4,10 +4,13 @@ from typing import List, Dict, Any, Optional
 from src.config import config
 
 class LocalLLMClient:
-    def __init__(self):
+    def __init__(self, lazy_load: bool = False):
         self.tokenizer = None
         self.model = None
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        if not lazy_load:
+            print(f"[LLM] Pre-loading local model '{config.llm_model_name}' on {self.device} at startup...")
+            self._load_model()
 
     def _load_model(self):
         """Lazy load tokenizer and model to conserve memory until needed."""

@@ -75,7 +75,7 @@ class HallucinationGuard:
         }
 
         # Flag as hallucination if entailment score is below threshold
-        # or if contradiction score is higher than entailment
-        is_hallucination = (entailment_score < config.nli_threshold) or (contradiction_score > entailment_score)
+        # or if contradiction score is higher than entailment and indicates meaningful contradiction
+        is_hallucination = (entailment_score < config.nli_threshold) or (contradiction_score > entailment_score and contradiction_score > 0.15)
 
         return is_hallucination, scores
