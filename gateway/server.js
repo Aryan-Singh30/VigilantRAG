@@ -887,8 +887,11 @@ app.delete('/api/documents/:docId', authenticateToken, async (req, res) => {
 // Serve frontend React static build files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Catch-all route to serve React index.html for client-side routing
-app.get('*', (req, res) => {
+// Catch-all middleware to serve React index.html for client-side routing (excluding /api routes)
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: "API route not found" });
+    }
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
