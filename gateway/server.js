@@ -26,6 +26,7 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch(err => console.error('❌ Failed to connect to MongoDB:', err.message));
 
 const app = express();
+app.set('trust proxy', 1); // Trust reverse proxy headers (required for express-rate-limit in cloud environments)
 const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholderStripeKey');
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholderKey',
