@@ -1,3 +1,8 @@
+// Polyfill global.crypto for older Node environments (like Node 18) to prevent Mongoose/MongoDB connection crash
+if (!global.crypto) {
+    global.crypto = require('crypto');
+}
+
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -71,11 +76,14 @@ const PLAN_LIMITS = {
     }
 };
 
-// Secure CORS configurations
+// Secure CORS configurations (supporting localhost development and Hugging Face deployment)
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'];
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        if (!origin || 
+            allowedOrigins.indexOf(origin) !== -1 || 
+            origin.includes('huggingface.co') || 
+            origin.includes('hf.space')) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS policy'));
